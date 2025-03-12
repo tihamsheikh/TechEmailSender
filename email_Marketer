@@ -1,0 +1,43 @@
+import schedule, smtplib, os, time
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+
+
+def mailing(recipient):
+  username = os.environ['mailUsername']
+  password = os.environ['mailPassword']
+  email = "To test the post"
+  server = "smtp.gmail.com"
+  port = 587
+  s = smtplib.SMTP(host=server, port=port)
+
+  s.starttls()
+  s.login(username, password)
+
+  msg = MIMEMultipart()
+  msg['To'] = recipient 
+  msg['From'] = username
+  msg['Subject'] = "This is text"
+  msg.attach(MIMEText(email, 'html'))
+  s.send_message(msg)
+  s.quit()
+
+def sendMail():
+  recipient = vincephgameing@gmail.com
+  mailing(recipient)
+  print("""
+  Prepairing for today's message.....
+  ....
+  ...
+  Done!
+  Sending..
+  
+  Mail Sent
+  """)
+
+schedule.every(3).seconds.do(sendMail)
+
+while True:
+  schedule.run_pending()
+  time.sleep(1)
