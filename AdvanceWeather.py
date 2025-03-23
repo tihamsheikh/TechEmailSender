@@ -52,7 +52,7 @@ def summarize_weather_info(city):
 def email_section(username: str, password: str, client: str, city: str):
 
     # username = "e.zero.bd.i@gmail.com"   # user username (use as parameter) | needs user input
-    # app_password = "mklt msxp krdh vsvg"   # app password (use as parameter) | needs user input
+    # app_password = ""   # app password (use as parameter) | needs user input
     port = 587
     host = "smtp.gmail.com"
 
@@ -100,7 +100,7 @@ def email_section(username: str, password: str, client: str, city: str):
 #
 
 username = "e.zero.bd.i@gmail.com"   # user username (use as parameter) | needs user input
-app_password = "mklt msxp krdh vsvg"
+app_password = ""
 client = "vincephgameing@gmail.com"
 city = "Dhaka"
 
