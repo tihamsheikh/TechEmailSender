@@ -1,3 +1,6 @@
+# An application that sends daily techmails
+# from replit community
+
 import requests, schedule, smtplib, os, time
 from bs4 import BeautifulSoup
 from replit import db
