@@ -2,6 +2,9 @@
 # pkg smtplib, gemini, tkinter, schedule, email
 # api open weather
 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# use try except bfor production
+
 # key hash- do not remove!!!!
 # hTaChIdMrBfTafjf 43uh934 f
 # aHdOhSfA9Y3I48(*GB(*YNR*(W
@@ -10,7 +13,7 @@
 # hajfh uawehM uisadhniw
 
 # email pkgs
-import smtplib, requests, schedule, time
+import smtplib, requests, time
 import KEYS
 from google import genai
 from email.mime.multipart import MIMEMultipart
@@ -100,34 +103,49 @@ def email_section(username, password, client, place):
     server.quit()
     print("Successfully\nEmail sent")
 
-# mail sending part (operation 4)
-def mailing():
-    # use get() of the tkinter var on deployment
-    username = "e.zero.bd.i@gmail.com"
-    app_password = KEYS.gmail_key
-    client = "vincephgameing@gmail.com"
-    place = "Dhaka"
+# scheduled mail sending part (operation 4 )
+def mailing_start():
+    print("inside mailing start")
+    global state
+    state = True
 
-    email_section(username, app_password, client, place)
-# scheduled mail sending part (operation 4 [optional])
-def mailing_start(interval):
-    schedule.every(interval).minute.do(mailing) # change to hour on deployment
+    def run_task():
+        username = username_var.get()
+        app_password = password_var.get()
+        client = client_var.get()
+        place = place_var.get()
+        interval = interval_var.get()
+        print(f"inside the run task---- {interval} {type(interval)}")
 
-    while state:
-        schedule.run_pending()
-        print("Running.....")
-        time.sleep(20)  # change to 1800 on hourly rate
 
+        if state:
+            try :
+                email_section(username, app_password, client, place)
+                confirmation_var.set("Weather mail is active")
+                delay = interval * 60 * 60 * 1000  # hour * minutes * seconds * miliseceonds
+                app.after(delay, run_task)
+
+            except Exception:
+                confirmation_var.set("Error!!! Reset the app")
+    run_task()
+
+# resets the variable and task
+def reset():
+    global state
+    state = False
+
+    confirmation_var.set("Weather mailing is cancelled")
+    username_var.set(value="")
+    password_var.set(value="")
+    client_var.set(value="")
+    place_var.set(value="")
 
 # GUI start
-app = ttk.Window()
+app = ttk.Window(themename="journal")
 app.title("Advance weather")
 app.geometry("450x650")
 # style variable
 font = "Calibri"
-
-# username, app_password, client, place (all entry)
-# time_diff (radio btn 3 6 12), submit, reset (button)
 
 # after submition every entry field would go blank except buttons
 # but on reset the vars would go blank and entry would go normal
@@ -136,8 +154,9 @@ username_var = tk.StringVar()
 password_var = tk.StringVar()
 client_var = tk.StringVar()
 place_var = tk.StringVar()
-# time_diff = tk.IntVar()
+interval_var = tk.IntVar()
 
+confirmation_var = tk.StringVar(value="State")
 
 label = ttk.Label(
     master=app,
@@ -158,8 +177,8 @@ frame_username.pack(pady=4)
 frame_password.pack(pady=4)
 frame_client.pack(pady=4)
 frame_place.pack(pady=4)
-frame_interval.pack(pady=4)
-frame_buttons.pack(pady=10)
+frame_interval.pack(pady=10, ipady=10)
+frame_buttons.pack(pady=10, ipady=6)
 
 # username widget
 username_label = ttk.Label(
@@ -169,7 +188,7 @@ username_label = ttk.Label(
 )
 username_entry = ttk.Entry(master=frame_username, font=font, textvariable=username_var)
 
-username_label.pack(side="left", ipadx=5)
+username_label.pack(side="left", ipadx=13)
 username_entry.pack(ipadx=10)
 
 # password widget
@@ -180,7 +199,7 @@ password_label = ttk.Label(
 )
 password_entry = ttk.Entry(master=frame_password, font=font, textvariable=password_var)
 
-password_label.pack(side="left", ipadx=2)
+password_label.pack(side="left", ipadx=20)
 password_entry.pack(ipadx=10)
 
 # client widget
@@ -191,8 +210,8 @@ client_label = ttk.Label(
 )
 client_entry = ttk.Entry(master=frame_client, font=font, textvariable=client_var)
 
-client_label.pack(side="left", ipadx=2)
-client_entry.pack(ipadx=10)
+client_label.pack(side="left", ipadx=2, padx=7)
+client_entry.pack(ipadx=10, padx=20)
 
 # place widget
 place_label = ttk.Label(
@@ -202,35 +221,41 @@ place_label = ttk.Label(
 )
 place_entry = ttk.Entry(master=frame_place, font=font, textvariable=place_var)
 
-place_label.pack(side="left", ipadx=2)
-place_entry.pack(ipadx=10)
+place_label.pack(side="left", ipadx=2, padx=8)
+place_entry.pack(ipadx=10, padx=20)
 
 # Interval selection
+interval_label = ttk.Label(master=frame_interval, text="Choose Interval", font=f"{font} 14")
+interval_label.pack(pady=4, ipady=10)
 
-interval_button = ttk.Radiobutton(
-    master=frame_interval
-)
-interval_button.pack()
+interval3 = ttk.Radiobutton(master=frame_interval, text="3 hours", value=3, variable= interval_var, command= lambda: print(interval_var.get()))
+interval3.pack(side="left", ipadx=10)
+
+interval6 = ttk.Radiobutton(master=frame_interval, text="6 hours", value=6, variable= interval_var, command= lambda: print(interval_var.get()))
+interval6.pack(side="left", ipadx=10)
+
+interval12 = ttk.Radiobutton(master=frame_interval, text="12 hours", value=12, variable= interval_var, command= lambda: print(type(interval_var.get())))
+interval12.pack(side="left", ipadx=10)
 
 # submit and reset
-
 submit_btn = ttk.Button(
     master=frame_buttons,
-    text="Submit"
+    text="Submit",
+    command= mailing_start
 )
 
 reset_btn = ttk.Button(
     master=frame_buttons,
-    text="Reset"
+    text="Reset",
+    command= reset
 )
 
 submit_btn.pack(side="left", ipadx=10,  padx=15)
 reset_btn.pack(side="left", ipadx=15, padx=15)
 
 
-
-
-
+confirm_label = ttk.Label(master=app, textvariable=confirmation_var, font=f"{font} 20")
+confirm_label.pack(pady=30)
 
 
 
